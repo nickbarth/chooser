@@ -56,6 +56,7 @@ var (
 
 func (c Chooser) Choose(choices []string) string {
 	oldstate, _ := terminal.MakeRaw(0)
+	defer terminal.Restore(0, oldstate)
 
 	c.choices = choices
 	c.matches = choices
@@ -68,8 +69,6 @@ func (c Chooser) Choose(choices []string) string {
 	c.printChoices()
 	c.printPrompt()
 	c.readInput()
-
-	terminal.Restore(0, oldstate)
 
 	return "one"
 }
@@ -155,6 +154,8 @@ func (c Chooser) readInput() {
 }
 
 func main() {
+	fmt.Println("Pick a number:")
+
 	chooser := NewChooser(5, 20)
 	choice := chooser.Choose([]string{"one", "two", "three", "four", "five", "six", "seven"})
 

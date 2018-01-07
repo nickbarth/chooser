@@ -3,15 +3,20 @@ package main
 import (
 	"golang.org/x/crypto/ssh/terminal"
 	"io"
-	"math/rand"
 	"os"
 )
+
+type Searcher interface {
+	Search(search string, sortable []string) (sorted []string)
+}
 
 type Chooser struct {
 	height  int
 	width   int
 	options []string
+	matches []string
 	term    *terminal.Terminal
+	search  Searcher
 	r       io.Reader
 }
 
@@ -21,10 +26,12 @@ func NewChooser() *Chooser {
 
 	return &Chooser{
 		r:       os.Stdin,
+		search:  FuzzySearcher{},
 		term:    term,
 		height:  5,
 		width:   width,
 		options: []string{"one", "two", "three", "four", "five", "six", "seven"},
+		matches: []string{"one", "two", "three", "four", "five", "six", "seven"},
 	}
 }
 
@@ -42,7 +49,7 @@ func (c Chooser) Choose() {
 		c.term.Write(tcReturn)
 	}
 	c.clear()
-	c.draw()
+	c.printChoices()
 	c.readInput()
 }
 
@@ -67,31 +74,32 @@ func (c Chooser) clear() {
 	}
 }
 
-func (c Chooser) drawPrompt() {
+func (c Chooser) printPrompt() {
 	c.writeRaw(tcLineStart)
 	c.write("> ")
 }
 
-func (c Chooser) draw() {
-	n := 0
-	for n = 0; n < len(c.options); n++ {
-		if n > (c.height - 2) {
+func (c Chooser) printChoices() {
+	for i := 0; i < c.height-len(c.matches)-1; i++ {
+		c.writeln("")
+	}
+
+	for n, match := range c.matches {
+		if n > c.height-2 {
 			break
 		}
-		c.writeln(c.options[n])
+		c.writeln(match)
 	}
-	c.drawPrompt()
+
+	c.printPrompt()
 }
 
-func (c *Chooser) sortOptions() {
-	for n := range c.options {
-		m := rand.Intn(n + 1)
-		c.options[n], c.options[m] = c.options[m], c.options[n]
-	}
+func (c *Chooser) searchOptions(search string) {
+	c.matches = c.search.Search(search, c.options)
 }
 
 func (c Chooser) readInput() {
-	var result []byte
+	var search []byte
 	var f = os.Stdin
 
 	for {
@@ -102,10 +110,10 @@ func (c Chooser) readInput() {
 			break
 		}
 
-		result = append(result, buf[0])
+		search = append(search, buf[0])
 		c.clear()
-		c.sortOptions()
-		c.draw()
+		c.searchOptions(string(search))
+		c.printChoices()
 	}
 
 	c.write("\n")

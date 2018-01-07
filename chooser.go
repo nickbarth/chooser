@@ -13,14 +13,14 @@ type Searcher interface {
 type Chooser struct {
 	height  int
 	width   int
-	options []string
+	choices []string
 	matches []string
 	term    *terminal.Terminal
 	search  Searcher
 	r       io.Reader
 }
 
-func NewChooser() *Chooser {
+func NewChooser(height int, choices []string) *Chooser {
 	width, _, _ := terminal.GetSize(0)
 	term := terminal.NewTerminal(os.Stdin, "")
 
@@ -28,10 +28,10 @@ func NewChooser() *Chooser {
 		r:       os.Stdin,
 		search:  FuzzySearcher{},
 		term:    term,
-		height:  5,
+		height:  height,
 		width:   width,
-		options: []string{"one", "two", "three", "four", "five", "six", "seven"},
-		matches: []string{"one", "two", "three", "four", "five", "six", "seven"},
+		choices: choices,
+		matches: choices,
 	}
 }
 
@@ -95,7 +95,7 @@ func (c Chooser) printChoices() {
 }
 
 func (c *Chooser) searchOptions(search string) {
-	c.matches = c.search.Search(search, c.options)
+	c.matches = c.search.Search(search, c.choices)
 }
 
 func (c Chooser) readInput() {
@@ -123,6 +123,6 @@ func main() {
 	oldstate, _ := terminal.MakeRaw(0)
 	defer terminal.Restore(0, oldstate)
 
-	chooser := NewChooser()
+	chooser := NewChooser(3, []string{"one", "two", "three", "four", "five", "six", "seven"})
 	chooser.Choose()
 }

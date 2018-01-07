@@ -35,21 +35,25 @@ func NewChooser(height int, choices []string) *Chooser {
 	}
 }
 
+const (
+	tcEscape = byte(27)
+	tcReturn = byte(10)
+)
+
 var (
-	tcEscape    = byte(27)
 	tcUp        = []byte{tcEscape, '[', 'A'}
 	tcDown      = []byte{tcEscape, '[', 'B'}
 	tcClearLine = []byte{tcEscape, '[', '2', 'K'}
 	tcLineStart = []byte{tcEscape, '[', 'G'}
-	tcReturn    = []byte{'\n'}
 )
 
 func (c Chooser) Choose() {
 	for n := 0; n < c.height-1; n++ {
-		c.term.Write(tcReturn)
+		c.term.Write([]byte{tcReturn})
 	}
 	c.clear()
 	c.printChoices()
+	c.printPrompt()
 	c.readInput()
 }
 
@@ -90,8 +94,6 @@ func (c Chooser) printChoices() {
 		}
 		c.writeln(match)
 	}
-
-	c.printPrompt()
 }
 
 func (c *Chooser) searchOptions(search string) {
@@ -114,6 +116,8 @@ func (c Chooser) readInput() {
 		c.clear()
 		c.searchOptions(string(search))
 		c.printChoices()
+		c.printPrompt()
+		c.write(string(search))
 	}
 
 	c.write("\n")
@@ -123,6 +127,6 @@ func main() {
 	oldstate, _ := terminal.MakeRaw(0)
 	defer terminal.Restore(0, oldstate)
 
-	chooser := NewChooser(3, []string{"one", "two", "three", "four", "five", "six", "seven"})
+	chooser := NewChooser(5, []string{"one", "two", "three", "four", "five", "six", "seven"})
 	chooser.Choose()
 }

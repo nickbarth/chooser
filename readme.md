@@ -4,7 +4,7 @@ chooser is a library for creating command-line option pickers.
 
 ### Usage
 
-``go
+```go
 import "github.com/nickbarth/chooser"
 
 func main() {

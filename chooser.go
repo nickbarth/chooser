@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"golang.org/x/crypto/ssh/terminal"
 	"io"
 	"os"
@@ -20,8 +21,8 @@ type Chooser struct {
 	r       io.Reader
 }
 
-func NewChooser(height int, choices []string) *Chooser {
-	width, _, _ := terminal.GetSize(0)
+func NewChooser(height int, width int) *Chooser {
+	// width, height, _ := terminal.GetSize(0)
 	term := terminal.NewTerminal(os.Stdin, "")
 
 	return &Chooser{
@@ -30,8 +31,8 @@ func NewChooser(height int, choices []string) *Chooser {
 		term:    term,
 		height:  height,
 		width:   width,
-		choices: choices,
-		matches: choices,
+		choices: []string{},
+		matches: []string{},
 	}
 }
 
@@ -53,14 +54,24 @@ var (
 	tcLineStart = []byte{tcEscape, '[', 'G'}
 )
 
-func (c Chooser) Choose() {
+func (c Chooser) Choose(choices []string) string {
+	oldstate, _ := terminal.MakeRaw(0)
+
+	c.choices = choices
+	c.matches = choices
+
 	for n := 0; n < c.height-1; n++ {
 		c.term.Write([]byte{tcNewline})
 	}
+
 	c.clear()
 	c.printChoices()
 	c.printPrompt()
 	c.readInput()
+
+	terminal.Restore(0, oldstate)
+
+	return "one"
 }
 
 func (c Chooser) writeln(ln string) {
@@ -144,9 +155,8 @@ func (c Chooser) readInput() {
 }
 
 func main() {
-	oldstate, _ := terminal.MakeRaw(0)
-	defer terminal.Restore(0, oldstate)
+	chooser := NewChooser(5, 20)
+	choice := chooser.Choose([]string{"one", "two", "three", "four", "five", "six", "seven"})
 
-	chooser := NewChooser(5, []string{"one", "two", "three", "four", "five", "six", "seven"})
-	chooser.Choose()
+	fmt.Println("You Chose:", choice)
 }

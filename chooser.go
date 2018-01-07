@@ -36,8 +36,14 @@ func NewChooser(height int, choices []string) *Chooser {
 }
 
 const (
-	tcEscape = byte(27)
-	tcReturn = byte(10)
+	tcEscape    = byte(27)
+	tcNewline   = byte(10)
+	tcReturn    = byte(13)
+	tcBackspace = byte(127)
+	tcCtrlC     = byte(23)
+	tcCtrlW     = byte(23)
+	tcCtrlU     = byte(21)
+	tcTab       = byte(9)
 )
 
 var (
@@ -49,7 +55,7 @@ var (
 
 func (c Chooser) Choose() {
 	for n := 0; n < c.height-1; n++ {
-		c.term.Write([]byte{tcReturn})
+		c.term.Write([]byte{tcNewline})
 	}
 	c.clear()
 	c.printChoices()
@@ -79,6 +85,7 @@ func (c Chooser) clear() {
 }
 
 func (c Chooser) printPrompt() {
+	c.writeRaw(tcClearLine)
 	c.writeRaw(tcLineStart)
 	c.write("> ")
 }
@@ -108,11 +115,24 @@ func (c Chooser) readInput() {
 		var buf [1]byte
 		n, _ := f.Read(buf[:])
 
-		if n == 0 || buf[0] == '\n' || buf[0] == '\r' {
+		if n == 0 || buf[0] == tcReturn {
 			break
 		}
 
-		search = append(search, buf[0])
+		switch buf[0] {
+		case tcTab:
+		case tcBackspace:
+			if len(search) > 1 {
+				search = search[:len(search)-1]
+			} else if len(search) == 1 {
+				search = []byte{}
+			}
+		case tcCtrlW, tcCtrlU:
+			search = []byte{}
+		default:
+			search = append(search, buf[0])
+		}
+
 		c.clear()
 		c.searchOptions(string(search))
 		c.printChoices()

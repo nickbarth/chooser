@@ -8,8 +8,10 @@ chooser is a library for creating command-line option pickers.
 import "github.com/nickbarth/chooser"
 
 func main() {
-	ch := NewChooser(5, 20)
-	choice := chr.Choose([]string{"one", "two", "three", "four", "five", "six"})
+	fmt.Println("Pick a number:")
+
+	ch := chooser.NewChooser(5, 20)
+	choice := ch.Choose([]string{"one", "two", "three", "four", "five", "six"})
 
 	fmt.Println("You Chose:", choice)
 }

@@ -1,4 +1,4 @@
-package main
+package chooser
 
 import (
 	_ "fmt"

@@ -1,7 +1,7 @@
-package main
+package chooser
 
 import (
-	"fmt"
+	_ "fmt"
 	"golang.org/x/crypto/ssh/terminal"
 	"io"
 	"os"
@@ -174,6 +174,7 @@ Read:
 	return string(search)
 }
 
+/*
 func main() {
 	fmt.Println("Pick a number:")
 
@@ -182,3 +183,4 @@ func main() {
 
 	fmt.Println("You Chose:", choice)
 }
+*/

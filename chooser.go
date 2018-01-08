@@ -22,8 +22,16 @@ type Chooser struct {
 }
 
 func NewChooser(height int, width int) *Chooser {
-	// width, height, _ := terminal.GetSize(0)
+	tWidth, tHeight, _ := terminal.GetSize(0)
 	term := terminal.NewTerminal(os.Stdin, "")
+
+	if height == 0 {
+		height = tHeight
+	}
+
+	if width == 0 {
+		width = tWidth
+	}
 
 	return &Chooser{
 		r:       os.Stdin,

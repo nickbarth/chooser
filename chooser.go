@@ -68,9 +68,9 @@ func (c Chooser) Choose(choices []string) string {
 	c.clear()
 	c.printChoices()
 	c.printPrompt()
-	c.readInput()
+	selected := c.readInput()
 
-	return "one"
+	return selected
 }
 
 func (c Chooser) writeln(ln string) {
@@ -117,20 +117,24 @@ func (c *Chooser) searchOptions(search string) {
 	c.matches = c.search.Search(search, c.choices)
 }
 
-func (c Chooser) readInput() {
+func (c Chooser) readInput() string {
 	var search []byte
 	var f = os.Stdin
 
+Read:
 	for {
 		var buf [1]byte
 		n, _ := f.Read(buf[:])
 
-		if n == 0 || buf[0] == tcReturn {
-			break
+		if n == 0 {
+			break Read
 		}
 
 		switch buf[0] {
+		case tcReturn:
+			break Read
 		case tcTab:
+			search = []byte(c.matches[len(c.matches)-1])
 		case tcBackspace:
 			if len(search) > 1 {
 				search = search[:len(search)-1]
@@ -151,6 +155,8 @@ func (c Chooser) readInput() {
 	}
 
 	c.write("\n")
+
+	return string(search)
 }
 
 func main() {

@@ -41,7 +41,8 @@ const (
 	tcNewline   = byte(10)
 	tcReturn    = byte(13)
 	tcBackspace = byte(127)
-	tcCtrlC     = byte(23)
+	tcCtrlC     = byte(3)
+	tcCtrlD     = byte(4)
 	tcCtrlW     = byte(23)
 	tcCtrlU     = byte(21)
 	tcTab       = byte(9)
@@ -136,6 +137,9 @@ Read:
 		f.Read(buf[:])
 
 		switch buf[0] {
+		case tcEscape, tcCtrlC, tcCtrlD:
+			search = []byte{}
+			break Read
 		case tcReturn:
 			search = []byte(c.matches[len(c.matches)-1])
 			c.printFull(search)

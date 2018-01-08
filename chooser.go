@@ -149,8 +149,10 @@ Read:
 			search = []byte{}
 			break Read
 		case tcReturn:
-			search = []byte(c.matches[len(c.matches)-1])
-			c.printFull(search)
+			if len(search) > 0 {
+				search = []byte(c.matches[len(c.matches)-1])
+				c.printFull(search)
+			}
 			break Read
 		case tcTab:
 			search = []byte(c.matches[len(c.matches)-1])

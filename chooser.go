@@ -117,6 +117,14 @@ func (c *Chooser) searchOptions(search string) {
 	c.matches = c.search.Search(search, c.choices)
 }
 
+func (c *Chooser) printFull(search []byte) {
+	c.clear()
+	c.searchOptions(string(search))
+	c.printChoices()
+	c.printPrompt()
+	c.write(string(search))
+}
+
 func (c Chooser) readInput() string {
 	var search []byte
 	var f = os.Stdin
@@ -124,14 +132,13 @@ func (c Chooser) readInput() string {
 Read:
 	for {
 		var buf [1]byte
-		n, _ := f.Read(buf[:])
 
-		if n == 0 {
-			break Read
-		}
+		f.Read(buf[:])
 
 		switch buf[0] {
 		case tcReturn:
+			search = []byte(c.matches[len(c.matches)-1])
+			c.printFull(search)
 			break Read
 		case tcTab:
 			search = []byte(c.matches[len(c.matches)-1])
@@ -147,11 +154,7 @@ Read:
 			search = append(search, buf[0])
 		}
 
-		c.clear()
-		c.searchOptions(string(search))
-		c.printChoices()
-		c.printPrompt()
-		c.write(string(search))
+		c.printFull(search)
 	}
 
 	c.write("\n")

@@ -70,6 +70,10 @@ func (c Chooser) Choose(choices []string) string {
 	c.choices = choices
 	c.matches = choices
 
+	if len(choices) < c.height {
+		c.height = len(choices) + 1
+	}
+
 	for n := 0; n < c.height-1; n++ {
 		c.term.Write([]byte{tcNewline})
 	}

@@ -153,7 +153,9 @@ Read:
 			search = []byte{}
 			break Read
 		case tcReturn:
-			if len(search) > 0 {
+			if len(c.matches) < 1 {
+				search = []byte{}
+			} else if len(search) > 0 {
 				search = []byte(c.matches[len(c.matches)-1])
 				c.printFull(search)
 			}

@@ -1,7 +1,6 @@
 package chooser
 
 import (
-	_ "fmt"
 	"regexp"
 	"sort"
 	"strings"
@@ -49,12 +48,3 @@ func (f FuzzySearcher) Search(search string, searchable []string) []string {
 	matches := f.getMatches(search, searchable)
 	return f.sortMatches(matches)
 }
-
-/*
-func main() {
-	f := FuzzySearcher{}
-	ss := f.Search("abc", []string{"ahello btown cthere", "abc", "aabbcc"})
-
-	fmt.Println(ss)
-}
-*/

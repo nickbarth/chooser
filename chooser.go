@@ -63,7 +63,7 @@ var (
 	tcLineStart = []byte{tcEscape, '[', 'G'}
 )
 
-func (c Chooser) Choose(choices []string) string {
+func (c Chooser) Choose(search string, choices []string) string {
 	oldstate, _ := terminal.MakeRaw(0)
 	defer terminal.Restore(0, oldstate)
 
@@ -78,10 +78,8 @@ func (c Chooser) Choose(choices []string) string {
 		c.term.Write([]byte{tcNewline})
 	}
 
-	c.clear()
-	c.printChoices()
-	c.printPrompt()
-	selected := c.readInput()
+	c.printFull([]byte(search))
+	selected := c.readInput([]byte(search))
 
 	return selected
 }
@@ -138,8 +136,7 @@ func (c *Chooser) printFull(search []byte) {
 	c.write(string(search))
 }
 
-func (c Chooser) readInput() string {
-	var search []byte
+func (c Chooser) readInput(search []byte) string {
 	var f = os.Stdin
 
 Read:

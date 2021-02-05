@@ -178,14 +178,3 @@ Read:
 
 	return string(search)
 }
-
-/*
-func main() {
-	fmt.Println("Pick a number:")
-
-	chooser := NewChooser(5, 20)
-	choice := chooser.Choose([]string{"one", "two", "three", "four", "five", "six", "seven"})
-
-	fmt.Println("You Chose:", choice)
-}
-*/

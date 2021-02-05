@@ -10,7 +10,7 @@ import "github.com/nickbarth/chooser"
 func main() {
 	fmt.Println("Pick a number:")
 
-	ch := chooser.NewChooser(5, 20) # height, width
+	ch := chooser.NewChooser(5, 20) // height, width
 	choice := ch.Choose([]string{"one", "two", "three", "four", "five", "six"})
 
 	fmt.Println("You Chose:", choice)
